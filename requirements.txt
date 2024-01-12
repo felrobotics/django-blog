@@ -1,3 +1,4 @@
 Django==4.2.9
 django-taggit
 django-htmx
+Markdown
