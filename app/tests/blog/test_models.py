@@ -7,3 +7,7 @@ class TestPostModel:
     def test_str_return(self, post_factory):
         post = post_factory(title="test post")
         assert post.__str__() == "test post"
+
+    def test_add_tags(self, post_factory):
+        post = post_factory(title="test post", tags=["test-tag"])
+        assert post.tags.count() == 1
