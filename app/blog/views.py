@@ -1,8 +1,7 @@
-from typing import Any
-from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
 from .models import Post
+from .forms import PostSearchForm
 
 
 # Create your views here.
@@ -41,7 +40,27 @@ class TagListView(ListView):
             return "blog/components/post-list-elements-tags.html"
         return "blog/tags.html"
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs):
         context = super(TagListView, self).get_context_data(**kwargs)
         context["tag"] = self.kwargs["tag"]
         return context
+
+
+class PostSearchView(ListView):
+    model = Post
+    paginate_by = 10
+    context_object_name = "posts"
+    form_class = PostSearchForm
+
+    def get_queryset(self):
+        form = self.form_class(self.request.GET)
+        if form.is_valid():
+            return Post.objects.filter(
+                title__icontains=form.cleaned_data["search_field"]
+            )
+        return []
+
+    def get_template_names(self):
+        if self.request.htmx:
+            return "blog/components/post-list-elements-search.html"
+        return "blog/search.html"
